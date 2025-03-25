@@ -42,15 +42,6 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  secure: true, // Force secure connection
-});
-
 // 🟢 API to Add Transactions
 app.post("/api/transaction", async (req, res) => {
   const newTransaction = new Transaction(req.body);
@@ -93,65 +84,6 @@ app.delete("/api/transaction/:id", async (req, res) => {
     res.json({ message: "Transaction Deleted!" });
   } catch (error) {
     res.status(500).json({ error: "Error deleting transaction" });
-  }
-});
-
-// Function to send low balance email
-const sendLowBalanceEmail = async (email, balance) => {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "⚠️ Low Balance Alert",
-    text: `Your BudgetBuddy balance is low: ₹${balance}. Please review your transactions!`,
-  };
-
-  try {
-    const result = await transporter.sendMail(mailOptions);
-    console.log("✅ Low balance email sent successfully:", result);
-  } catch (error) {
-    console.error("❌ Error sending email:", error);
-  }
-};
-
-// Check balance after transaction addition
-const checkAndSendLowBalanceEmail = async (userEmail) => {
-  console.log(`🔍 Checking balance for user: ${userEmail}`);
-
-  const transactions = await Transaction.find({ userEmail });
-
-  console.log(
-    `📊 Found ${transactions.length} transactions for user ${userEmail}`
-  );
-
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpense = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((acc, curr) => acc + curr.amount, 0);
-  const balance = totalIncome - totalExpense;
-
-  console.log(`💰 Balance calculated: ₹${balance}`);
-
-  if (balance < 500) {
-    console.log("⚠️ Balance is low, sending email...");
-    sendLowBalanceEmail(userEmail, balance);
-  } else {
-    console.log("✅ Balance is sufficient, no email needed.");
-  }
-};
-
-// Modify the add transaction API to check balance
-app.post("/api/transaction", async (req, res) => {
-  try {
-    const newTransaction = new Transaction(req.body);
-    await newTransaction.save();
-    res.json({ message: "Transaction Added!" });
-
-    // Check balance after adding transaction
-    checkAndSendLowBalanceEmail(req.body.userEmail);
-  } catch (error) {
-    res.status(500).json({ error: "Error adding transaction" });
   }
 });
 
