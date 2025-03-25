@@ -32,7 +32,7 @@ function App() {
   const fetchTransactions = async (email) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/transactions/${email}`
+        `https://budgetbuddy-bqtx.onrender.com/api/transactions/${email}`
       );
       setTransactions(res.data);
     } catch (error) {
@@ -50,7 +50,7 @@ function App() {
     setShowPopup(false);
 
     try {
-      await axios.post("http://localhost:5000/api/user", newUser);
+      await axios.post("https://budgetbuddy-bqtx.onrender.com/api/user", newUser);
       fetchTransactions(newUser.email);
     } catch (error) {
       console.error("Error saving user:", error);
@@ -72,7 +72,7 @@ function App() {
     };
 
     try {
-      await axios.post("http://localhost:5000/api/transaction", newTransaction);
+      await axios.post("https://budgetbuddy-bqtx.onrender.com/api/transaction", newTransaction);
       setTransactions([...transactions, newTransaction]);
       setAmount("");
     } catch (error) {
