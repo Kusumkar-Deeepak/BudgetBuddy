@@ -256,23 +256,30 @@ function BudgetBuddy() {
             {transactions.map((t, index) => (
               <div
                 key={index}
-                className={`p-2 my-2 flex items-center space-x-2 rounded ${
+                className={`p-3 my-2 flex items-center justify-between rounded-lg shadow-md ${
                   t.type === "income" ? "bg-green-600" : "bg-red-600"
                 }`}
               >
-                <CategoryIcon />
-                <span>
-                  {t.category}: ₹{t.amount}
-                </span>
-                <span className="ml-auto text-sm">
-                  {new Date(t.date).toLocaleDateString()}
-                </span>
-                <button
-                  onClick={() => deleteTransaction(t._id)}
-                  className="ml-4 text-white"
-                >
-                  <DeleteIcon />
-                </button>
+                {/* Left Section: Icon & Transaction Details */}
+                <div className="flex items-center space-x-3">
+                  <CategoryIcon />
+                  <span className="font-medium">
+                    {t.category}: ₹{t.amount}
+                  </span>
+                </div>
+
+                {/* Right Section: Date & Delete Button */}
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm">
+                    {new Date(t.date).toLocaleDateString()}
+                  </span>
+                  <button
+                    onClick={() => deleteTransaction(t._id)}
+                    className="text-white hover:text-gray-300 transition"
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
