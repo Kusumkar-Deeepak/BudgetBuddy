@@ -50,7 +50,13 @@ function App() {
     setShowPopup(false);
 
     try {
-      await axios.post("https://budgetbuddy-bqtx.onrender.com/api/user", newUser);
+      await axios.post(
+        "https://budgetbuddy-bqtx.onrender.com/api/user",
+        newUser,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       fetchTransactions(newUser.email);
     } catch (error) {
       console.error("Error saving user:", error);
@@ -72,7 +78,13 @@ function App() {
     };
 
     try {
-      await axios.post("https://budgetbuddy-bqtx.onrender.com/api/transaction", newTransaction);
+      await axios.post(
+        "https://budgetbuddy-bqtx.onrender.com/api/transaction",
+        newTransaction,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       setTransactions([...transactions, newTransaction]);
       setAmount("");
     } catch (error) {
