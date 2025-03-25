@@ -6,21 +6,19 @@ const bodyParser = require("body-parser");
 
 const app = express();
 app.use(express.json());
-// Allow requests from your frontend
-const corsOptions = {
-  origin: "https://budgetbudddy.onrender.com",
-  methods: "GET,POST,PUT,DELETE",
-  allowedHeaders: "Content-Type",
-};
+app.use(
+  cors({
+    origin: "https://budgetbudddy.onrender.com", // Allow only your frontend
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+  })
+);
 
-app.use(cors(corsOptions));
+app.options("*", cors()); // Handle preflight requests
 app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
