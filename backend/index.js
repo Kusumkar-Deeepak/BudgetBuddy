@@ -45,9 +45,10 @@ const User = mongoose.model("User", UserSchema);
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASS, // Use the App Password here
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
+  secure: true, // Force secure connection
 });
 
 // 🟢 API to Add Transactions
@@ -105,16 +106,23 @@ const sendLowBalanceEmail = async (email, balance) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Low balance email sent!");
+    const result = await transporter.sendMail(mailOptions);
+    console.log("✅ Low balance email sent successfully:", result);
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("❌ Error sending email:", error);
   }
 };
 
 // Check balance after transaction addition
 const checkAndSendLowBalanceEmail = async (userEmail) => {
+  console.log(`🔍 Checking balance for user: ${userEmail}`);
+
   const transactions = await Transaction.find({ userEmail });
+
+  console.log(
+    `📊 Found ${transactions.length} transactions for user ${userEmail}`
+  );
+
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((acc, curr) => acc + curr.amount, 0);
@@ -123,8 +131,13 @@ const checkAndSendLowBalanceEmail = async (userEmail) => {
     .reduce((acc, curr) => acc + curr.amount, 0);
   const balance = totalIncome - totalExpense;
 
+  console.log(`💰 Balance calculated: ₹${balance}`);
+
   if (balance < 500) {
+    console.log("⚠️ Balance is low, sending email...");
     sendLowBalanceEmail(userEmail, balance);
+  } else {
+    console.log("✅ Balance is sufficient, no email needed.");
   }
 };
 
